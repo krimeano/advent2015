@@ -49,7 +49,8 @@ class Part:
             data = e.data or ExampleReader(e).read()
             v = self.solve(data, *e.args)
             if v != e.val:
-                print('EXPECTED', e.val, 'RECEIVED', v, 'WITH DATA', data, ' AND ARGUMENTS', *e.args)
+                args_txt = e.args and (' AND ARGUMENTS %s' % e.args) or ''
+                print('EXPECTED', e.val, 'RECEIVED', v, 'WITH DATA', data, args_txt)
                 return False
 
         return self.solve(InputReader().read(), )
