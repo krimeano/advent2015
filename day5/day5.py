@@ -62,7 +62,7 @@ class Part1(aoc.Part):
         self.validator = validator
         super().__init__(expectations)
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         out = 0
         for line in data:
             out += self.validator.validate(line)

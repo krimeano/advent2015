@@ -111,7 +111,7 @@ class InstructionFixedOn(InstructionOn):
 class Part1(aoc.Part):
     lights = []
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         self.init_lights()
         for line in data:
             self.apply_instruction(self.get_instruction(line))

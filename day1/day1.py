@@ -7,7 +7,7 @@ class Part1(Part):
         ')': -1
     }
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         out = sum(self.shifts[x] for x in data[0])
         return out
 
@@ -16,7 +16,7 @@ class Part2(Part1):
     basement = -1
     ground_floor = 0
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         floor = self.ground_floor
         ix = 0
         for x in data[0]:

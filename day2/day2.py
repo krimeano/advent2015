@@ -2,7 +2,7 @@ from aoc import Part, Day, Exp
 
 
 class Part1(Part):
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         out = 0
         for box in data:
             edges = sorted(int(edge) for edge in box.split('x'))
@@ -13,7 +13,7 @@ class Part1(Part):
 
 
 class Part2(Part):
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         out = 0
         for box in data:
             x, y, z = sorted(int(edge) for edge in box.split('x'))

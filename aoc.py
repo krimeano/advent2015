@@ -2,7 +2,7 @@ import os
 
 
 class Exp:
-    def __init__(self, val: int, suffix='', data=None, *args):
+    def __init__(self, val: int, *args, suffix='', data=None):
         """
         :param int val:
         :param str suffix:
@@ -47,16 +47,17 @@ class Part:
     def run(self):
         for e in self.expectations:
             data = e.data or ExampleReader(e).read()
-            v = self.solve(data)
+            v = self.solve(data, *e.args)
             if v != e.val:
-                print('EXPECTED', e.val, 'RECEIVED', v, 'WITH DATA', data)
+                print('EXPECTED', e.val, 'RECEIVED', v, 'WITH DATA', data, ' AND ARGUMENTS', *e.args)
                 return False
 
-        return self.solve(InputReader().read())
+        return self.solve(InputReader().read(), )
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         """
         :param list[str] data:
+        :param list args:
         :return:
         """
         return 0

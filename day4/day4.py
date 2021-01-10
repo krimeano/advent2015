@@ -5,7 +5,7 @@ import hashlib
 class Part1(aoc.Part):
     zeroes = 5
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         ix = 0
         print()
         while ix < 10 ** (self.zeroes + 2):

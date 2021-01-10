@@ -9,7 +9,7 @@ class Part1(Part):
         'v': [0, -1]
     }
 
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         f = (0, 0)
         houses = {f}
         for x in data[0]:
@@ -21,7 +21,7 @@ class Part1(Part):
 
 
 class Part2(Part1):
-    def solve(self, data) -> int:
+    def solve(self, data, *args) -> int:
         f = g = (0, 0)
         houses = {f}
         for x in data[0]:
