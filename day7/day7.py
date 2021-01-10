@@ -29,26 +29,27 @@ class Wire:
 
     @staticmethod
     def get_wire(line):
+        if '->' not in line:
+            return Wire.make_wire(line)
+
         cmd = line.split(' -> ')
-        x = cmd.pop(-1)
-        if x not in Wire.wires:
-            Wire.wires[x] = Wire(x)
+        return Wire.make_wire(cmd.pop()).connect(cmd.pop().split(' '))
 
-        wire = Wire.wires[x]
-
-        if len(cmd):
-            wire.connect(cmd[0].split(' '))
-
-        return wire
+    @staticmethod
+    def make_wire(name: str):
+        if re.match(r'^\d+$', name):
+            return Wire(name, int(name))
+        if name not in Wire.wires:
+            Wire.wires[name] = Wire(name)
+        return Wire.wires[name]
 
     @staticmethod
     def reset():
         Wire.wires = {}
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, value=0):
         self.name = name
-        self.value = 0
-        self.arg = 0
+        self.value = value
         self.prev = []
         self.next = []
         self.operator = Operator.SIGNAL
@@ -56,42 +57,44 @@ class Wire:
 
     def __str__(self):
         s = short[self.operator]
-        pp = [x.name for x in self.prev] + (self.arg and [str(self.arg)] or [])
-        qq = [str(x.value) for x in self.prev] + (self.arg and [str(self.arg)] or [])
+        pp = [x.name for x in self.prev]
+        qq = [str(x.value) for x in self.prev]
         if len(pp) == 1:
             pp.insert(0, '')
             qq.insert(0, '')
-        return '{n}({p}) = ({q}) = {v}'.format(n=self.name, p=s.join(pp), q=s.join(qq), v=self.value)
+        return '{n} ({p}) = ({q}) = {v}'.format(n=self.name, p=s.join(pp), q=s.join(qq), v=self.value)
 
     def __int__(self):
         return self.value
 
-    def connect(self, cmd):
-        if len(cmd) == 1:
+    def connect(self, params):
+        if len(params) == 1:
             self.operator = Operator.SIGNAL
-            if re.match(r'^\d+$', cmd[0]):
-                self.arg = int(cmd[0])
-                return self
         else:
-            self.operator = Operator(cmd.pop(-2))
+            self.operator = Operator(params.pop(-2))
 
-        if self.operator in [Operator.RSHIFT, Operator.LSHIFT]:
-            self.arg = int(cmd.pop(-1))
-        while cmd:
-            prev = Wire.get_wire(cmd.pop(0))
+        while params:
+            prev = Wire.get_wire(params.pop(0))
             self.prev.append(prev)
-            self.count_in += 1
+
             prev.next.append(self)
+            if str(prev.value) != prev.name:
+                self.count_in += 1
 
         return self
 
     def resolve(self):
+        x = self.prev[0].value
+
         if self.operator == Operator.SIGNAL:
-            self.value = self.arg
+            self.value = x
             return self
 
-        x = self.prev[0].value
-        y = len(self.prev) > 1 and self.prev[1].value or self.arg
+        if self.operator == Operator.NOT:
+            self.value = ONE ^ x
+            return self
+
+        y = len(self.prev) > 1 and self.prev[1].value or 0
 
         if self.operator == Operator.AND:
             self.value = x & y
@@ -101,8 +104,7 @@ class Wire:
             self.value = (x << y) & ONE
         elif self.operator == Operator.RSHIFT:
             self.value = (x >> y) & ONE
-        elif self.operator == Operator.NOT:
-            self.value = ONE ^ x
+
         return self
 
 
@@ -121,17 +123,17 @@ class Part1(aoc.Part):
                 print([x.name for x in sorted_wires])
                 print([x.name + str(x.count_in) for x in all_wires])
                 raise Exception('non zero count in = %s' % wire.count_in)
+
             for x in wire.next:
                 x.count_in -= 1
+
             sorted_wires.append(wire)
 
         for x in sorted_wires:
-            print(x.resolve(), 'count_in=', x.count_in)
+            print(x.resolve())
 
         return measure_at in Wire.wires and int(Wire.wires[measure_at]) or 0
 
-
-print(ONE)
 
 print(aoc.Day([
     Part1([
