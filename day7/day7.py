@@ -26,6 +26,7 @@ short = {
 
 class Wire:
     wires = {}
+    sorted_wires = []
 
     @staticmethod
     def get_wire(line):
@@ -46,6 +47,28 @@ class Wire:
     @staticmethod
     def reset():
         Wire.wires = {}
+        Wire.sorted_wires = []
+
+    @staticmethod
+    def sort_wires():
+        all_wires = [Wire.wires[ix] for ix in Wire.wires]
+        Wire.sorted_wires = []
+
+        while all_wires:
+            all_wires = sorted(all_wires, key=lambda x: x.count_in)
+            wire = all_wires.pop(0)
+            if wire.count_in != 0:
+                print(wire)
+                print([x.name for x in Wire.sorted_wires])
+                print([x.name + str(x.count_in) for x in all_wires])
+                raise Exception('non zero count in = %s' % wire.count_in)
+
+            for x in wire.next:
+                x.count_in -= 1
+
+            Wire.sorted_wires.append(wire)
+
+        return Wire.sorted_wires
 
     def __init__(self, name: str, value=0):
         self.name = name
@@ -110,29 +133,27 @@ class Wire:
 
 class Part1(aoc.Part):
     def solve(self, data, measure_at='a') -> int:
-        print()
         Wire.reset()
-        all_wires = [Wire.get_wire(x) for x in data]
-        sorted_wires = []
+        for x in data:
+            Wire.get_wire(x)
 
-        while all_wires:
-            all_wires = sorted(all_wires, key=lambda x: x.count_in)
-            wire = all_wires.pop(0)
-            if wire.count_in != 0:
-                print(wire)
-                print([x.name for x in sorted_wires])
-                print([x.name + str(x.count_in) for x in all_wires])
-                raise Exception('non zero count in = %s' % wire.count_in)
-
-            for x in wire.next:
-                x.count_in -= 1
-
-            sorted_wires.append(wire)
-
-        for x in sorted_wires:
-            print(x.resolve())
+        for x in Wire.sort_wires():
+            x.resolve()
 
         return measure_at in Wire.wires and int(Wire.wires[measure_at]) or 0
+
+
+class Part2(aoc.Part):
+
+    def solve(self, data, *args) -> int:
+        a = Wire.get_wire('a')
+        b = Wire.get_wire('b')
+        print(b)
+        b.prev = [Wire.get_wire(str(int(a)))]
+        print(b)
+        for x in Wire.sorted_wires:
+            x.resolve()
+        return int(a)
 
 
 print(aoc.Day([
@@ -146,4 +167,5 @@ print(aoc.Day([
         aoc.Exp(65412, 'h'),
         aoc.Exp(65079, 'i'),
     ]),
+    Part2([])
 ]).solve())
