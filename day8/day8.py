@@ -18,7 +18,6 @@ class Parser:
         self.string = string
 
     def __int__(self):
-        print(self.string, self.total, self.meaningful)
         return self.total - self.meaningful
 
     def process(self):
@@ -79,14 +78,32 @@ class Part1(aoc.Part):
     def solve(self, data, *args) -> int:
         out = 0
         for line in data:
-            print()
-            print(line)
             out += int(Parser(line).process())
+        return out
+
+
+class Encoder(Parser):
+    def process(self):
+        self.meaningful = len(self.string)
+        self.total = 2
+        for x in self.string:
+            self.total += x in (self.BACKSLASH, self.QUOTE) and 2 or 1
+        return self
+
+
+class Part2(aoc.Part):
+    def solve(self, data, *args) -> int:
+        out = 0
+        for line in data:
+            out += int(Encoder(line).process())
         return out
 
 
 print(aoc.Day([
     Part1([
         aoc.Exp(12)
+    ]),
+    Part2([
+        aoc.Exp(19)
     ])
 ]).solve())
